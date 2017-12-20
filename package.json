@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "aws-sdk": "^2.170.0",
+    "serverless": "^1.24.1"
+  },
+  "devDependencies": {
+    "aws-lambda-local": "^1.0.15"
+  }
+}

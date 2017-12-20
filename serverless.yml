@@ -1,0 +1,44 @@
+service: "jfs-${env:ENV}"
+
+provider:
+  name:       aws
+  runtime:    nodejs6.10
+  region:     ${env:AWS_DEFAULT_REGION, 'us-west-2'}
+  stage:      ${opt:stage}
+  memorySize: 128
+  timeout:    2
+
+  environment:
+    ALLOW_CIDR: "${env:ALLOW_CIDR, 'x.x.x.x'}"
+    FAILURE_ENDPOINT: "jfs-${env:ENV}-failures"
+
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - Kinesis:Publish
+      Resource: "arn:aws:sns:${opt:region, self:provider.region}:*:jfs-${env:ENV}-failures"
+
+package:
+  include:
+    - node_modules/*
+    - src/*.js
+  exclude:
+    - venv
+
+functions:
+  compute:
+    handler: src/compute.compute
+    events:
+      - stream:
+          type: kinesis
+          arn: { Fn::GetAtt: [ KinesisStream, Arn ] }
+          batchSize: 100
+          startingPosition: TRIM_HORIZON
+
+resources:
+  Resources:
+    KinesisStream:
+      Type: AWS::Kinesis::Stream
+      Properties:
+        Name: "jfs-${env:ENV}-failures"
+        ShardCount: 1
