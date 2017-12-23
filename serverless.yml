@@ -6,17 +6,24 @@ provider:
   region:     ${env:AWS_DEFAULT_REGION, 'us-west-2'}
   stage:      ${opt:stage}
   memorySize: 128
-  timeout:    2
+  timeout:    6
 
   environment:
     ALLOW_CIDR: "${env:ALLOW_CIDR, 'x.x.x.x'}"
+    ENV: "${env:ENV, 'missing'}"
     FAILURE_ENDPOINT: "jfs-${env:ENV}-failures"
+    SUBSCRIPTION_ENDPOINT: "jes-${env:ENV}-v1-list"
+    EMAIL_ENDPOINT: "yams-${env:ENV}-send"
 
   iamRoleStatements:
     - Effect: Allow
       Action:
-        - Kinesis:Publish
-      Resource: "arn:aws:sns:${opt:region, self:provider.region}:*:jfs-${env:ENV}-failures"
+        - Lambda:InvokeFunction
+      Resource: "arn:aws:lambda:${opt:region, self:provider.region}:*:function:${self:provider.environment.SUBSCRIPTION_ENDPOINT}"
+    - Effect: Allow
+      Action:
+        - Kinesis:PutRecord
+      Resource: "arn:aws:kinesis:${opt:region, self:provider.region}:*:stream/${self:provider.environment.EMAIL_ENDPOINT}"
 
 package:
   include:

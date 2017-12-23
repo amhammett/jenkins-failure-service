@@ -9,9 +9,9 @@ if (!AWS.config.region && aws_default_region) {
   });
 }
 
-const env_name = process.env.ENV || 'missing'
-const subscription_endpoint = process.env.SUBSCRIPTION_ENDPOINT || 'jes-'+env_name+'-v1-list'
-const email_stream = process.env.EMAIL_ENDPOINT || 'yams-'+env_name+'-send'
+const env_name = process.env.ENV
+const subscription_endpoint = process.env.SUBSCRIPTION_ENDPOINT
+const email_stream = process.env.EMAIL_ENDPOINT
 
 let generate_jenkins_name = (url) => {
   let name = url.split('/')[2].split(':')[0].split('.')[0]
@@ -44,8 +44,8 @@ let process_failure_record = (record) => {
     JSON.stringify(record.data), 'base64'
   ).toString("ascii");
   let data = JSON.parse(kinesis_data)
-  let lambda = new AWS.Lambda();
 
+  let lambda = new AWS.Lambda();
   lambda.invoke({
     FunctionName: subscription_endpoint,
     Payload: ''
@@ -55,16 +55,16 @@ let process_failure_record = (record) => {
     }
 
     if(sub_data.Payload) {
-      let records = JSON.parse(JSON.parse(sub_data.Payload).body)
+      let subscriptions = JSON.parse(JSON.parse(sub_data.Payload).body)
       let email_subject = generate_subject(data)
       let email_from = generate_reply_email(data.build.full_url)
       let email_body = scrape_logs(data.build.full_url)
 
-      records.forEach(function(record) {
-        if((data.name).search(record.pattern) !== -1) {
+      subscriptions.forEach(function(subscription) {
+        if((data.name).search(subscription.pattern) !== -1) {
           let email_data = {
             sender: email_from,
-            receiver: record.email,
+            receiver: subscription.email,
             subject: email_subject,
             body: email_body
           }
@@ -74,8 +74,7 @@ let process_failure_record = (record) => {
             Data: JSON.stringify(email_data),
             PartitionKey: 'jfs-lambda-event'
           }
-          var kinesis = new AWS.Kinesis();
-
+          let kinesis = new AWS.Kinesis();
           kinesis.putRecord(kinesis_params, function(err, data) {
             if(err) {
               console.error('Error submitting email request: '+err.message)
