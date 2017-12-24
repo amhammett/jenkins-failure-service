@@ -55,33 +55,40 @@ let process_failure_record = (record) => {
     }
 
     if(sub_data.Payload) {
-      let subscriptions = JSON.parse(JSON.parse(sub_data.Payload).body)
-      let email_subject = generate_subject(data)
-      let email_from = generate_reply_email(data.build.full_url)
-      let email_body = scrape_logs(data.build.full_url)
+      let subscription_data = JSON.parse(sub_data.Payload)
 
-      subscriptions.forEach(function(subscription) {
-        if((data.name).search(subscription.pattern) !== -1) {
-          let email_data = {
-            sender: email_from,
-            receiver: subscription.email,
-            subject: email_subject,
-            body: email_body
-          }
+      if(subscription_data.errorMessage) {
+        console.error('Unable to retrieve subscription data')
+        console.error(subscription_data.errorMessage)
+      } else {
+        let subscriptions = JSON.parse(subscription_data.body)
+        let email_subject = generate_subject(data)
+        let email_from = generate_reply_email(data.build.full_url)
+        let email_body = scrape_logs(data.build.full_url)
 
-          let kinesis_params = {
-            StreamName: email_stream,
-            Data: JSON.stringify(email_data),
-            PartitionKey: 'jfs-lambda-event'
-          }
-          let kinesis = new AWS.Kinesis();
-          kinesis.putRecord(kinesis_params, function(err, data) {
-            if(err) {
-              console.error('Error submitting email request: '+err.message)
+        subscriptions.forEach(function(subscription) {
+          if((data.name).search(subscription.pattern) !== -1) {
+            let email_data = {
+              sender: email_from,
+              receiver: subscription.email,
+              subject: email_subject,
+              body: email_body
             }
-          })
-        }
-      });
+
+            let kinesis_params = {
+              StreamName: email_stream,
+              Data: JSON.stringify(email_data),
+              PartitionKey: 'jfs-lambda-event'
+            }
+            let kinesis = new AWS.Kinesis();
+            kinesis.putRecord(kinesis_params, function(err, data) {
+              if(err) {
+                console.error('Error submitting email request: '+err.message)
+              }
+            })
+          }
+        });
+      }
     }
   });
 }

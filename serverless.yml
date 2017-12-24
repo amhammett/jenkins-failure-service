@@ -9,9 +9,7 @@ provider:
   timeout:    6
 
   environment:
-    ALLOW_CIDR: "${env:ALLOW_CIDR, 'x.x.x.x'}"
     ENV: "${env:ENV, 'missing'}"
-    FAILURE_ENDPOINT: "jfs-${env:ENV}-failures"
     SUBSCRIPTION_ENDPOINT: "jes-${env:ENV}-v1-list"
     EMAIL_ENDPOINT: "yams-${env:ENV}-send"
 
