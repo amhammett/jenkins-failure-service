@@ -1,12 +1,20 @@
 {
     "Records": [
         {
-            "sequenceNumber": "49579999512791565995647237352547644395029881184493502466",
-            "approximateArrivalTimestamp": 1513801233.458,
-            "data": "eyJuYW1lIjoiYXNnYXJkIiwidXJsIjoiam9iL2FzZ2FyZC8iLCJidWlsZCI6eyJmdWxsX3VybCI6Imh0dHA6Ly9sb2NhbGhvc3Q6ODA4MC9qb2IvYXNnYXJkLzE4LyIsIm51bWJlciI6MTgsInBoYXNlIjoiRklOQUxJWkVEIiwic3RhdHVzIjoiRkFJTEVEIiwidXJsIjoiam9iL2FzZ2FyZC8xOC8iLCJzY20iOnsidXJsIjoiaHR0cHM6Ly9naXRodWIuY29tL2V2Z2VueS1nb2xkaW4vYXNnYXJkLmdpdCIsImJyYW5jaCI6Im9yaWdpbi9tYXN0ZXIiLCJjb21taXQiOiJjNmQ4NmRjNjU0YjEyNDI1ZTcwNmJjZjk1MWFkZmU1YTg2MjdhNTE3In0sImFydGlmYWN0cyI6eyJhc2dhcmQud2FyIjp7ImFyY2hpdmUiOiJodHRwOi8vbG9jYWxob3N0OjgwODAvam9iL2FzZ2FyZC8xOC9hcnRpZmFjdC9hc2dhcmQud2FyIn0sImFzZ2FyZC1zdGFuZGFsb25lLmphciI6eyJhcmNoaXZlIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgwL2pvYi9hc2dhcmQvMTgvYXJ0aWZhY3QvYXNnYXJkLXN0YW5kYWxvbmUuamFyIiwiczMiOiJodHRwczovL3MzLWV1LXdlc3QtMS5hbWF6b25hd3MuY29tL2V2Z2VueWctYmFrZXJ5L2FzZ2FyZC9hc2dhcmQtc3RhbmRhbG9uZS5qYXIifX19fQ==",
-            "partitionKey": "jns-lambda-event"
+            "kinesis": {
+                "kinesisSchemaVersion": "1.0",
+                "partitionKey": "jns-lambda-event",
+                "sequenceNumber": "49580105194060596254799935975560998965442809661893902338",
+                "data": "eyJuYW1lIjoiYXNnYXJkIiwidXJsIjoiam9iL2FzZ2FyZC8iLCJidWlsZCI6eyJmdWxsX3VybCI6Imh0dHA6Ly9sb2NhbGhvc3Q6ODA4MC9qb2IvYXNnYXJkLzE4LyIsIm51bWJlciI6MTgsInBoYXNlIjoiRklOQUxJWkVEIiwic3RhdHVzIjoiRkFJTEVEIiwidXJsIjoiam9iL2FzZ2FyZC8xOC8iLCJzY20iOnsidXJsIjoiaHR0cHM6Ly9naXRodWIuY29tL2V2Z2VueS1nb2xkaW4vYXNnYXJkLmdpdCIsImJyYW5jaCI6Im9yaWdpbi9tYXN0ZXIiLCJjb21taXQiOiJjNmQ4NmRjNjU0YjEyNDI1ZTcwNmJjZjk1MWFkZmU1YTg2MjdhNTE3In0sImFydGlmYWN0cyI6eyJhc2dhcmQud2FyIjp7ImFyY2hpdmUiOiJodHRwOi8vbG9jYWxob3N0OjgwODAvam9iL2FzZ2FyZC8xOC9hcnRpZmFjdC9hc2dhcmQud2FyIn0sImFzZ2FyZC1zdGFuZGFsb25lLmphciI6eyJhcmNoaXZlIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgwL2pvYi9hc2dhcmQvMTgvYXJ0aWZhY3QvYXNnYXJkLXN0YW5kYWxvbmUuamFyIiwiczMiOiJodHRwczovL3MzLWV1LXdlc3QtMS5hbWF6b25hd3MuY29tL2V2Z2VueWctYmFrZXJ5L2FzZ2FyZC9hc2dhcmQtc3RhbmRhbG9uZS5qYXIifX19fQ==",
+                "approximateArrivalTimestamp": 1514418113.453
+            },
+            "eventSource": "aws:kinesis",
+            "eventVersion": "1.0",
+            "eventID": "shardId-000000000000:49580105194060596254799935975560998965442809661893902338",
+            "eventName": "aws:kinesis:record",
+            "invokeIdentityArn": "arn:aws:iam::283996957043:role/jfs-st-v1-us-west-2-lambdaRole",
+            "awsRegion": "us-west-2",
+            "eventSourceARN": "arn:aws:kinesis:us-west-2:283996957043:stream/jfs-st-failures"
         }
-    ],
-    "NextShardIterator": "AAAAAAAAAAF9aA9EOXkzP0FaqfEyGBzY0+fzpniyQAgSmoEVdCDZn76FPRESoNwKIEHmF8bF9uJMyWzkGHZdvKG0LMySULqvcWjixePMLYmGt80wPLieEmCrAz7nr68KWzC0HoOSp4hcwaysO6VtV4Gbx6B3ZRlUJJK1yjsyCutpBvOz1j103P4ESZgzTweijUhwAaQUEU3l0VHMAyvlz/qoYhUIOG/6",
-    "MillisBehindLatest": 0
+    ]
 }
