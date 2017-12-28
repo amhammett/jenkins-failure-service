@@ -9,7 +9,7 @@ if (!AWS.config.region && aws_default_region) {
   });
 }
 
-const env_name = process.env.ENV
+const env_name = process.env.ENV_NAME
 const subscription_endpoint = process.env.SUBSCRIPTION_ENDPOINT
 const email_stream = process.env.EMAIL_ENDPOINT
 
@@ -40,10 +40,9 @@ let scrape_logs = (url) => {
 }
 
 let process_failure_record = (record) => {
-  let kinesis_data = new Buffer(
-    JSON.stringify(record.data), 'base64'
-  ).toString("ascii");
-  let data = JSON.parse(kinesis_data)
+  let record_data = new Buffer((record.kinesis.data), 'base64').toString("ascii");
+  let kinesis_data = JSON.parse(record_data)
+  let event_data = JSON.parse(kinesis_data.body)
 
   let lambda = new AWS.Lambda();
   lambda.invoke({
@@ -62,15 +61,25 @@ let process_failure_record = (record) => {
         console.error(subscription_data.errorMessage)
       } else {
         let subscriptions = JSON.parse(subscription_data.body)
-        let email_subject = generate_subject(data)
-        let email_from = generate_reply_email(data.build.full_url)
-        let email_body = scrape_logs(data.build.full_url)
+        let email_subject = generate_subject(event_data)
+        let email_from = generate_reply_email(event_data.build.full_url)
+        let email_body = scrape_logs(event_data.build.full_url)
 
         subscriptions.forEach(function(subscription) {
-          if((data.name).search(subscription.pattern) !== -1) {
+          console.log('subscription each..')
+          console.log(subscription)
+
+          let pattern_search = -1
+          try {
+            pattern_search = (event_data.name).search(subscription.pattern)
+          } catch (err) {
+            console.error('invalid search pattern provided')
+          }
+
+          if(pattern_search !== -1) {
             let email_data = {
-              sender: email_from,
-              receiver: subscription.email,
+              from: email_from,
+              to: subscription.email,
               subject: email_subject,
               body: email_body
             }
@@ -84,6 +93,9 @@ let process_failure_record = (record) => {
             kinesis.putRecord(kinesis_params, function(err, data) {
               if(err) {
                 console.error('Error submitting email request: '+err.message)
+              } else {
+                console.log('Submitted request to ' + email_stream)
+                console.log(email_data)
               }
             })
           }
@@ -96,8 +108,11 @@ let process_failure_record = (record) => {
 module.exports.compute = (event, context, callback) => {
   if(event.Records) {
     event.Records.forEach(function(record) {
+      console.log('processing record')
       process_failure_record(record)
     });
+  } else {
+    console.error('no data found')
   }
 
   callback(null, {
