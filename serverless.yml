@@ -9,8 +9,8 @@ provider:
   timeout:    6
 
   environment:
-    ENV: "${env:ENV, 'missing'}"
-    SUBSCRIPTION_ENDPOINT: "jes-${env:ENV}-v1-list"
+    ENV_NAME: "${env:ENV, 'missing'}"
+    SUBSCRIPTION_ENDPOINT: "jss-${env:ENV}-v1-list"
     EMAIL_ENDPOINT: "yams-${env:ENV}-send"
 
   iamRoleStatements:
@@ -37,7 +37,7 @@ functions:
       - stream:
           type: kinesis
           arn: { Fn::GetAtt: [ KinesisStream, Arn ] }
-          batchSize: 100
+          batchSize: 10
           startingPosition: TRIM_HORIZON
 
 resources:
