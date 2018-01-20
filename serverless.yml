@@ -1,16 +1,18 @@
 service: "jfs-${env:ENV}"
 
 provider:
-  name:       aws
-  runtime:    nodejs6.10
-  region:     ${env:AWS_DEFAULT_REGION, 'us-west-2'}
-  stage:      ${opt:stage}
-  memorySize: 128
-  timeout:    6
+  name:               aws
+  runtime:            nodejs6.10
+  region:             ${env:AWS_DEFAULT_REGION, 'us-west-2'}
+  stage:              ${opt:stage}
+  logRetentionInDays: 7
+  memorySize:         128
+  timeout:            10
 
   environment:
     ENV_NAME: "${env:ENV, 'missing'}"
     SUBSCRIPTION_ENDPOINT: "jss-${env:ENV}-v1-list"
+    LOG_RETRIEVE_ENDPOINT: "jlr-${env:ENV}-v1-console"
     EMAIL_ENDPOINT: "yams-${env:ENV}-send"
 
   iamRoleStatements:
@@ -20,8 +22,17 @@ provider:
       Resource: "arn:aws:lambda:${opt:region, self:provider.region}:*:function:${self:provider.environment.SUBSCRIPTION_ENDPOINT}"
     - Effect: Allow
       Action:
+        - Lambda:InvokeFunction
+      Resource: "arn:aws:lambda:${opt:region, self:provider.region}:*:function:${self:provider.environment.LOG_RETRIEVE_ENDPOINT}"
+    - Effect: Allow
+      Action:
         - Kinesis:PutRecord
       Resource: "arn:aws:kinesis:${opt:region, self:provider.region}:*:stream/${self:provider.environment.EMAIL_ENDPOINT}"
+
+  vpc:
+    securityGroupIds:
+      - { Ref: lambdaVpcSecurityGroup }
+    subnetIds: { Fn::Split: [ "\t" , "${env:VPC_SUBNETS}" ] }
 
 package:
   include:
@@ -47,3 +58,30 @@ resources:
       Properties:
         Name: "jfs-${env:ENV}-failures"
         ShardCount: 1
+    lambdaVpcSecurityGroup:
+      Type: 'AWS::EC2::SecurityGroup'
+      Properties:
+        GroupName:        "${self:service}-${opt:stage}-vpc-sg"
+        GroupDescription: 'allow lambda function to access vpc.'
+        VpcId:            "${env:VPC_ID}"
+        SecurityGroupIngress:
+          - IpProtocol: tcp
+            CidrIp:     0.0.0.0/0
+            FromPort:   "${env:JENKINS_PORT, '80'}"
+            ToPort:     "${env:JENKINS_PORT, '80'}"
+    lambdaVpcRole:
+      Type: 'AWS::IAM::Role'
+      Properties:
+        Path:     /
+        RoleName: "${self:service}-${opt:stage}-lambda-vpc"
+        AssumeRolePolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+            -
+              Effect: Allow
+              Action: 'sts:AssumeRole'
+              Principal:
+                Service:
+                  - lambda.amazonaws.com
+        ManagedPolicyArns:
+          - 'arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole'
