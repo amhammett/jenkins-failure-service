@@ -39,8 +39,8 @@ let email_queue = (email_data, callback) => {
 
 let email_format = (to_email, from_email, subject, email_text, callback) => {
   let email_data = {
-    from: to_email,
-    to: from_email,
+    from: from_email,
+    to: to_email,
     subject: subject,
     text: email_text
   }
