@@ -11,7 +11,7 @@ provider:
 
   environment:
     ENV_NAME: "${env:ENV, 'missing'}"
-    SUBSCRIPTION_ENDPOINT: "jss-${env:ENV}-v1-list"
+    SUBSCRIPTION_ENDPOINT: "nss-${env:ENV}-v1-list"
     LOG_RETRIEVE_ENDPOINT: "jlr-${env:ENV}-v1-console"
     EMAIL_ENDPOINT: "yams-${env:ENV}-send"
 
